@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+ENV/
+
+# Temporary Audio files
+/tmp/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.flac
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
