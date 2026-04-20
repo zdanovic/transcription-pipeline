@@ -7,8 +7,19 @@ class AudioTranscriber:
 
     def process_file(self, file_path: Path) -> dict:
         result = self.model.transcribe(str(file_path))
+        
+        segments = [
+            {
+                "start": segment["start"],
+                "end": segment["end"],
+                "text": segment["text"].strip(),
+            }
+            for segment in result["segments"]
+        ]
+        
         return {
-            "transcription": result["text"].strip()
+            "transcription": result["text"].strip(),
+            "segments": segments
         }
 
 transcriber = AudioTranscriber()
