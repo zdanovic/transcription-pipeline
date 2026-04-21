@@ -37,64 +37,64 @@ graph TD
 Ensure you have Python 3.10+ and `ffmpeg` installed.
 
 **macOS:**
-\`\`\`bash
+```bash
 brew install ffmpeg
-\`\`\`
+```
 
 **Ubuntu / Debian:**
-\`\`\`bash
+```bash
 sudo apt-get update && sudo apt-get install ffmpeg
-\`\`\`
+```
 
 ### 2. Environment Setup
 
 It is highly recommended to use a virtual environment:
 
-\`\`\`bash
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-\`\`\`
+```
 
 ### 3. Execution
 
 Start the Uvicorn application server:
 
-\`\`\`bash
+```bash
 uvicorn main:app --reload --port 8000
-\`\`\`
+```
 *(Note: OpenAI's Whisper "base" model, roughly ~140MB, will automatically download into your cache during the initial run).*
 
 ## API Usage
 
 ### Submit an Audio File
 
-\`\`\`bash
+```bash
 curl -X POST http://localhost:8000/api/v1/transcribe \
   -H "accept: application/json" \
   -H "Content-Type: multipart/form-data" \
   -F "file=@/path/to/your/audio.wav"
-\`\`\`
+```
 
 **Response:**
-\`\`\`json
+```json
 {
   "job_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
   "status": "queued"
 }
-\`\`\`
+```
 
 ### Check Job Status
 
 Poll the job endpoint using the ID provided in the previous step:
 
-\`\`\`bash
+```bash
 curl http://localhost:8000/api/v1/jobs/a1b2c3d4-e5f6-7890-1234-56789abcdef0
-\`\`\`
+```
 
 **Response:**
 *(Once completed, the 'status' updates and 'result' injects timestamps mapped to their respective segments)*
-\`\`\`json
+```json
 {
   "status": "completed",
   "result": {
@@ -113,4 +113,4 @@ curl http://localhost:8000/api/v1/jobs/a1b2c3d4-e5f6-7890-1234-56789abcdef0
     ]
   }
 }
-\`\`\`
+```
