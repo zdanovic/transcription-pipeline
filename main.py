@@ -1,8 +1,15 @@
+import logging
 import uuid
 from pathlib import Path
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
 
 from transcriber import transcriber
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Audio Transcription API")
 
@@ -11,14 +18,17 @@ app = FastAPI(title="Audio Transcription API")
 jobs: dict[str, dict] = {}
 
 def process_audio_task(job_id: str, file_path: Path):
+    logger.info(f"Background task started for job_id: {job_id}")
     try:
         jobs[job_id]["status"] = "processing"
         result = transcriber.process_file(file_path)
         jobs[job_id]["status"] = "completed"
         jobs[job_id]["result"] = result
+        logger.info(f"Task completed successfully for job_id: {job_id}")
     except Exception as e:
         jobs[job_id]["status"] = "failed"
         jobs[job_id]["error"] = str(e)
+        logger.error(f"Task failed for job_id: {job_id}. Error: {e}")
     finally:
         # Prevent disk space leaks by explicitly cleaning up
         if file_path.exists():
@@ -43,7 +53,9 @@ async def create_transcription_job(
         with open(temp_file, "wb") as f:
             while chunk := await file.read(1024 * 1024):
                 f.write(chunk)
-    except Exception:
+        logger.info(f"File uploaded and saved to {temp_file} for job_id: {job_id}")
+    except Exception as e:
+        logger.error(f"Failed to persist uploaded file for job_id: {job_id}. Error: {e}")
         raise HTTPException(status_code=500, detail="Failed to persist uploaded file")
         
     jobs[job_id] = {"status": "queued"}

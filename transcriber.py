@@ -1,5 +1,8 @@
+import logging
 import whisper
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 class AudioTranscriber:
     def __init__(self, model_size: str = "base"):
@@ -10,6 +13,7 @@ class AudioTranscriber:
     def process_file(self, file_path: Path) -> dict:
         # Whisper calls ffmpeg underneath to automatically downmix and resample to 16kHz
         # so we can skip explicit pydub/ffmpeg preprocessing for format standardization.
+        logger.info(f"Whisper started loading/transcribing file: {file_path}")
         result = self.model.transcribe(str(file_path))
         
         segments = [
